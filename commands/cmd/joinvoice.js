@@ -2,11 +2,9 @@ const Commando = require("discord.js-commando");
 const YTDL = require("ytdl-core-discord")
 
 async function Play(connection, message) {
-    let validate = await YTDL.validateURL("https://www.youtube.com/watch?v=DeoOJbQB8rU4");
-    console.log(validate);
-    let dispatcher = connection.play(await YTDL("https://www.youtube.com/watch?v=DeoOJbQB8rU4", {filter: "audioonly"}));
+    let dispatcher = connection.playOpusStream(await YTDL("https://youtu.be/CgnmRmF0zJg?list=PLfG0HYK6dC4z62yhJZQx7UMPQhzrPUIdc", {filter: "audioonly"}));
     dispatcher.on("end", () => {
-        connection.diconnect();
+        connection.disconnect();
     })
 }
 
@@ -30,11 +28,11 @@ class JoinVoice extends Commando.Command {
                     Play(connection, message);
                     
                 }).catch(error => {
-                    console.log("ree");
+                    console.log(error);
                 })
             }
             else {
-                console.log(rip);
+                console.log("rip");
             }
         }
         else {
