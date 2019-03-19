@@ -6,7 +6,8 @@ intended features:
  - collect map of youtube links per channel and allow user to request a channel a la sirius xm
  - archival of channels in case discord dies
  - play by radio
- - skip
+ - skip current track
+ - correctly handle timestamps & youtube playlists
 
 
 Running
