@@ -1,13 +1,4 @@
 const Commando = require("discord.js-commando");
-const YTDL = require("ytdl-core-discord")
-
-async function Play(connection, message) {
-    let dispatcher = connection.playOpusStream(await YTDL("https://youtu.be/CgnmRmF0zJg?list=PLfG0HYK6dC4z62yhJZQx7UMPQhzrPUIdc", {filter: "audioonly"}));
-    dispatcher.on("end", () => {
-        connection.disconnect();
-    })
-}
-
 
 class JoinVoice extends Commando.Command {
 
@@ -24,19 +15,17 @@ class JoinVoice extends Commando.Command {
         if(message.member.voiceChannel) {
             if(!message.guild.voiceConnection) {
                 message.member.voiceChannel.join().then((connection) => {
-                    message.channel.send("joined ur shit");
-                    Play(connection, message);
-                    
+                    //joined channel
                 }).catch(error => {
                     console.log(error);
                 })
             }
             else {
-                console.log("rip");
+                console.log("Voice connection already present");
             }
         }
         else {
-            message.channel.send("Couldn't join ur shit");
+            console.log("Commander not in voice channel");
         }
     }
 }
