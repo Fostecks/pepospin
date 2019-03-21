@@ -15,3 +15,7 @@ Running
 - npm install
 - node .
 - discord test server: https://discord.gg/ufXtmUF
+
+Discord API docs: https://discord.js.org
+Discord bot dashboard: https://discordapp.com/developers/teams/558011106203795456/information
+discord.js-commando guide (wrapper for discord.js for writing commands): https://github.com/discordjs/Commando-guide
