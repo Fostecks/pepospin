@@ -59,5 +59,7 @@ function getMap() {
     return radioMap;
 }
 
-module.exports = getMap;
-
+module.exports = {
+    "bot": bot,
+    "getMap": getMap
+}

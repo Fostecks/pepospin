@@ -1,6 +1,6 @@
 const Commando = require("discord.js-commando");
 const YTDL = require("ytdl-core-discord");
-const getMap = require("../../index.js");
+const indexExports = require("../../index.js");
 
 class Play extends Commando.Command {
 
@@ -14,12 +14,20 @@ class Play extends Commando.Command {
     }
 
     async run(message, args) {
-        async function Play(connection, message) {
-            console.log(getMap());
-            let dispatcher = connection.playOpusStream(await YTDL("https://youtu.be/CgnmRmF0zJg?list=PLfG0HYK6dC4z62yhJZQx7UMPQhzrPUIdc", {filter: "audioonly"}));
-            dispatcher.on("end", () => {
-                connection.disconnect();
-            })
+        let connection = message.guild.voiceConnection;
+        let radioMap = indexExports.getMap();
+        let songIndex = 0;
+        if(radioMap && connection && args) {
+            let linkArray = radioMap[args];
+            let dispatcher = connection.playOpusStream(await YTDL(linkArray[songIndex++], {filter: "audioonly"}));
+            dispatcher.on("end", async () => {
+                if(songIndex < linkArray.length) {
+                    dispatcher = connection.playOpusStream(await YTDL(linkArray[songIndex++], {filter: "audioonly"}));
+                } 
+                else {
+                    connection.disconnect();
+                }
+            });
         }
     }
 }
