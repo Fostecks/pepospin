@@ -1,5 +1,8 @@
 const Commando = require("discord.js-commando");
 
+/** 
+ * Bot command to make discord bot join the invoker's current voice channel.
+ */
 class JoinVoice extends Commando.Command {
 
     constructor(client) { 
@@ -11,6 +14,11 @@ class JoinVoice extends Commando.Command {
         });
     }
 
+    /**
+     * Method that executes on invocation of command.
+     * @param {String} message 
+     * @param {String} args 
+     */
     async run(message, args) {
         if(message.member.voiceChannel) {
             if(!message.guild.voiceConnection) {
@@ -30,7 +38,5 @@ class JoinVoice extends Commando.Command {
         }
     }
 }
-
-
 
 module.exports = JoinVoice;
