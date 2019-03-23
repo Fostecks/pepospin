@@ -35,6 +35,9 @@ class Play extends Commando.Command {
             indexExports.bot.user.setActivity(videoInfo.title, { type: 'STREAMING' });
         });
         try {
+            if(indexExports.bot.audioStreamDispatcher) {
+                indexExports.bot.audioStreamDispatcher.destroy();
+            }
             let dispatcher = connection.playStream(ytdl);
             return dispatcher;
         } catch(err) {
