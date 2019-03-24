@@ -22,9 +22,10 @@ class LeaveVoice extends Commando.Command {
      */
     async run(message, args) {
         if(message.guild.voiceConnection) {
+            indexExports.bot.killCommand = true;
             message.guild.voiceConnection.disconnect();
             indexExports.bot.user.setActivity(null);
-            console.log("Disconnected from: " + message)
+            console.log("Disconnected from voice chat");
         }
         else {
             message.channel.send("Not in a channel");
