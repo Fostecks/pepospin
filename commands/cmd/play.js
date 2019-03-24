@@ -48,17 +48,18 @@ class Play extends Commando.Command {
      * @param {String} args 
      */
     async run(message, args) {
+        indexExports.bot.killCommand = false;
         let connection = message.guild.voiceConnection;
         let radioMap = indexExports.getMap();
         let trackIndex = 0;
         if(radioMap && connection && args) {
             let linkArray = radioMap[args];
             let currentTrack = linkArray[trackIndex];
-            let dispatcher = await this.play(currentTrack, connection);
-            dispatcher.on("end", async () => {
-                if(trackIndex < linkArray.length) {
+            indexExports.bot.audioStreamDispatcher = await this.play(currentTrack, connection);
+            indexExports.bot.audioStreamDispatcher.on("end", async () => {
+                if(!indexExports.bot.killCommand && trackIndex < linkArray.length) {
                     currentTrack = linkArray[++trackIndex];
-                    dispatcher = await this.play(currentTrack, connection);
+                    indexExports.bot.audioStreamDispatcher = await this.play(currentTrack, connection);
                 }
                 else {
                     connection.disconnect();
