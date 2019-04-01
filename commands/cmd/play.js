@@ -61,8 +61,8 @@ class Play extends Commando.Command {
             // Audio play loop
             for(const link of linkArray) {
                 if(indexExports.bot.killCommand === true) break;
-                const dispatcher = await this.play(link, connection);
-                await new Promise(resolve => dispatcher.on('end', resolve));
+                indexExports.bot.audioStreamDispatcher = await this.play(link, connection);
+                await new Promise(resolve => indexExports.bot.audioStreamDispatcher.on('end', resolve));
             }
             connection.disconnect();
         }
