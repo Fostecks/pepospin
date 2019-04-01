@@ -1,7 +1,11 @@
 const Commando = require("discord.js-commando");
-const bot = new Commando.Client();
 const {token} = require('./config.json') 
 
+const bot = new Commando.Client({
+    disableEveryone: true,
+    unknownCommandResponse: false
+});
+const BOT_COMMAND_CHANNEL_NAME = "dev";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const radioMap = {};
 
@@ -41,6 +45,30 @@ bot.on('ready', async () => {
 });
 
 bot.login(token);
+
+bot.on('message', (message) => {
+    //is message a command
+    if(message.content.startsWith('!')) {
+
+        //is message in bot channel
+        if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
+            message.channel.fetchMessages().then((messages) => {
+                messages = messages.array().filter(x => x.id !== message.id);
+                for(const message of messages) {
+                    message.delete();
+                }
+            })
+        }
+        //is message not in bot channel
+        else {
+            message.delete();
+        }
+    }
+    //is message not a command message in bot channel
+    else if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
+        message.delete();
+    }
+});
 
 /**
  * Given an array containing discord.js Messages, harvests links
