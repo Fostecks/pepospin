@@ -1,12 +1,12 @@
 {
   "name": "pepospin",
   "version": "1.0.0",
-  "description": "Discord Bot for streaming internal youtube media",
+  "description": "A Node.js Discord bot to support a Sirius-XM-style Discord guild",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "mooper60@gmail.com",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.4.2",
