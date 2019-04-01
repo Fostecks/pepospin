@@ -54,7 +54,6 @@ class Play extends Commando.Command {
         indexExports.bot.killCommand = false;
         let connection = message.guild.voiceConnection;
         let radioMap = indexExports.getMap();
-        let trackIndex = 0;
         if(radioMap && connection && args) {
             let linkArray = radioMap[args];
             
