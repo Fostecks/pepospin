@@ -32,7 +32,7 @@ class Play extends Commando.Command {
             console.log("Audio bitrate: " + videoFormat.audioBitrate);
             console.log("Audio sample rate: " + videoFormat.audio_sample_rate);
             console.log("Attempting to play: " + videoInfo.title);
-            indexExports.bot.user.setActivity(videoInfo.title, { type: 'STREAMING' });
+            indexExports.bot.user.setActivity(videoInfo.title, { type: 'PLAYING' });
         });
         try {
             if(indexExports.bot.audioStreamDispatcher) {
@@ -54,20 +54,16 @@ class Play extends Commando.Command {
         indexExports.bot.killCommand = false;
         let connection = message.guild.voiceConnection;
         let radioMap = indexExports.getMap();
-        let trackIndex = 0;
         if(radioMap && connection && args) {
             let linkArray = radioMap[args];
-            let currentTrack = linkArray[trackIndex];
-            indexExports.bot.audioStreamDispatcher = await this.play(currentTrack, connection);
-            indexExports.bot.audioStreamDispatcher.on("end", async () => {
-                if(!indexExports.bot.killCommand && trackIndex < linkArray.length) {
-                    currentTrack = linkArray[++trackIndex];
-                    indexExports.bot.audioStreamDispatcher = await this.play(currentTrack, connection);
-                }
-                else {
-                    connection.disconnect();
-                }
-            });
+            
+            // Audio play loop
+            for(const link of linkArray) {
+                if(indexExports.bot.killCommand === true) break;
+                indexExports.bot.audioStreamDispatcher = await this.play(link, connection);
+                await new Promise(resolve => indexExports.bot.audioStreamDispatcher.on('end', resolve));
+            }
+            connection.disconnect();
         }
     }
 }

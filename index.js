@@ -23,6 +23,7 @@ bot.on('ready', async () => {
     ).then(allMessages => {
         allMessages.forEach(channelMessages => {
             let messageArray = channelMessages.array();
+            if(messageArray.length === 0) return;
             let linkCollection = collectLinks(messageArray);
             let channelName = messageArray[0].channel.name;
             if(linkCollection) {
