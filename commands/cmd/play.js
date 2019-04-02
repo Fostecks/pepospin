@@ -77,7 +77,6 @@ class Play extends Commando.Command {
                 if(indexExports.bot.killCommand === true) break;
                 indexExports.bot.audioStreamDispatcher = await this.play(link, connection);
 
-                console.log(videoMetadata);
                 await videoMetadataPromise;
                 let richText = new discord.RichEmbed()
                     .addField("Now Playing " + videoMetadata.videoInfo.title)
@@ -94,8 +93,6 @@ class Play extends Commando.Command {
             connection.disconnect();
         }
     }
-
-
 }
 
 module.exports = Play;

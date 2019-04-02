@@ -50,12 +50,6 @@ bot.on('ready', async () => {
 bot.login(token);
 
 bot.on('message', async (message) => {
-    //await pending deletes
-    // if(messagePurgePromise) {
-    //     await messagePurgePromise;
-    //     messagePurgePromise = null;
-    // }
-
     //is message in bot channel
     if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
 
@@ -76,8 +70,6 @@ bot.on('message', async (message) => {
                 return !isLastCommandMessage && !isLastBotMessage;
             });
 
-            // messagePurgePromise = Promise.all(messagesToDelete.map(message => message.delete()));
-            
             message.channel.bulkDelete(messagesToDelete);
         })
     }
