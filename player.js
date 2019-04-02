@@ -35,7 +35,7 @@ class Player {
      */
     async _play(trackID, connection) {
         this._resetVideoMetadataPromise();
-        let ytdl = YTDL(trackID, {quality: "highestaudio"});
+        let ytdl = YTDL(trackID, {filter: "audio", quality: "highestaudio"});
         ytdl.on('info', (videoInfo, videoFormat) => {
             console.log("Audio encoding: " + videoFormat.audioEncoding);
             console.log("Audio bitrate: " + videoFormat.audioBitrate);
@@ -70,6 +70,7 @@ class Player {
         this._activeQueue = new Promise(async (queueResolve, queueReject) => {
             // Audio play loop
             for(const link of linkArray) {
+                //check if something tried to force quit queue
                 if(indexExports.bot.killCommand === true) {
                     break;
                 }
@@ -82,18 +83,17 @@ class Player {
         return this._activeQueue;
     }
 
-    async killActiveQueue() {
+    async forceShiftQueue() {
         if(indexExports.bot.audioStreamDispatcher &&
             !indexExports.bot.audioStreamDispatcher.destroyed) {
-                indexExports.bot.killCommand = true;
                 indexExports.bot.audioStreamDispatcher.destroy();
         }
-        try {
-            await this._activeQueue;
-        }
-        catch(e) {
-            console.log(e);
-        }
+    }
+
+    async killActiveQueue() {
+        this.forceShiftQueue();
+        indexExports.bot.killCommand = true;
+        await this._activeQueue;
         indexExports.bot.killCommand = false;
     }
 }
