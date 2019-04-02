@@ -1,6 +1,7 @@
 const Commando = require("discord.js-commando");
-const YTDL = require("ytdl-core");
 const indexExports = require("../../index.js");
+const Player = require("../../player.js");
+
 
 /** 
  * Bot command to make discord bot start streaming youtube audio
@@ -19,51 +20,24 @@ class Play extends Commando.Command {
         });
     }
 
-    /** 
-     * Plays a youtube link as an audio stream into a voiceConnection. 
-     * Sets bot activity as "Playing <title>"
-     * @param {String} trackID full youtube link as a string
-     * @param {VoiceConnection} connection discord guild VoiceConnection object
-     */
-    async play(trackID, connection) {
-        let ytdl = YTDL(trackID, {quality: "highestaudio"});
-        ytdl.on('info', (videoInfo, videoFormat) => {
-            console.log("Audio encoding: " + videoFormat.audioEncoding);
-            console.log("Audio bitrate: " + videoFormat.audioBitrate);
-            console.log("Audio sample rate: " + videoFormat.audio_sample_rate);
-            console.log("Attempting to play: " + videoInfo.title);
-            indexExports.bot.user.setActivity(videoInfo.title, { type: 'PLAYING' });
-        });
-        try {
-            if(indexExports.bot.audioStreamDispatcher) {
-                indexExports.bot.audioStreamDispatcher.destroy();
-            }
-            let dispatcher = connection.playStream(ytdl);
-            return dispatcher;
-        } catch(err) {
-            console.log(err);
-        }
-    }
-
     /**
      * Method that executes on invocation of command.
      * @param {String} message 
      * @param {String} args 
      */
     async run(message, args) {
-        indexExports.bot.killCommand = false;
+        let player = new Player().getInstance();
+        await player.killActiveQueue();
         let connection = message.guild.voiceConnection;
         let radioMap = indexExports.getMap();
         if(radioMap && connection && args) {
             let linkArray = radioMap[args];
+            await player.playArray(linkArray, connection, message.channel).then(() => {
+                if(indexExports.bot.killCommand === false) {
+                    connection.disconnect();
+                }
+            });
             
-            // Audio play loop
-            for(const link of linkArray) {
-                if(indexExports.bot.killCommand === true) break;
-                indexExports.bot.audioStreamDispatcher = await this.play(link, connection);
-                await new Promise(resolve => indexExports.bot.audioStreamDispatcher.on('end', resolve));
-            }
-            connection.disconnect();
         }
     }
 }

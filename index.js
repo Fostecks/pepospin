@@ -1,10 +1,15 @@
 const Commando = require("discord.js-commando");
-const bot = new Commando.Client();
-const {token} = require('./config.json') 
+const {token, BOT_CLIENT_ID} = require('./config.json') 
 
+const bot = new Commando.Client({
+    disableEveryone: true,
+    unknownCommandResponse: false
+});
+const BOT_COMMAND_CHANNEL_NAME = "dev";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const radioMap = {};
-
+let botMessage;
+let commandMessage;
 
 /** 
  * Listener method for Discord bot's 'ready' lifecycle event. 
@@ -41,6 +46,32 @@ bot.on('ready', async () => {
 });
 
 bot.login(token);
+
+bot.on('message', async (message) => {
+    //is message in bot channel
+    if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
+
+        //keep latest command message
+        if(message.content.startsWith("!")) {
+            commandMessage = message;
+        }
+        //keep latest bot reply
+        else if(message.author.id === BOT_CLIENT_ID) {
+            botMessage = message;
+        }
+        
+        //delete every other message
+        message.channel.fetchMessages().then(async (messages) => {
+            let messagesToDelete = messages.array().filter(x => {
+                let isLastCommandMessage = commandMessage && x.id === commandMessage.id;
+                let isLastBotMessage = botMessage && x.id === botMessage.id;
+                return !isLastCommandMessage && !isLastBotMessage;
+            });
+
+            message.channel.bulkDelete(messagesToDelete);
+        })
+    }
+});
 
 /**
  * Given an array containing discord.js Messages, harvests links

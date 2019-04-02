@@ -25,6 +25,7 @@ class LeaveVoice extends Commando.Command {
             indexExports.bot.killCommand = true;
             message.guild.voiceConnection.disconnect();
             indexExports.bot.user.setActivity(null);
+            message.channel.send("Disconnected from voice chat");
             console.log("Disconnected from voice chat");
         }
         else {
