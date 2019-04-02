@@ -10,8 +10,6 @@ const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const radioMap = {};
 let botMessage;
 let commandMessage;
-let messagePurgePromise;
-
 
 /** 
  * Listener method for Discord bot's 'ready' lifecycle event. 
