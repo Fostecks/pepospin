@@ -1,3 +1,6 @@
+const indexExports = require("./index.js");
+const Player = require("./player.js");
+
 module.exports = {
     
     shuffleArray: function(array) {
@@ -13,5 +16,19 @@ module.exports = {
             array[randomIndex] = temporaryValue;
         }
         return array;
+    },
+
+    play: async function(linkArray, connection, channel) {
+        let player = new Player().getInstance();
+        await player.killActiveQueue();
+        if(linkArray && connection) {
+            let shuffledLinkArray = this.shuffleArray(linkArray);
+            await player.playArray(shuffledLinkArray, connection, channel).then(() => {
+                if(indexExports.bot.killCommand === false) {
+                    connection.disconnect();
+                }
+            });
+            
+        }
     }
 }
