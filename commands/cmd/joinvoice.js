@@ -24,6 +24,7 @@ class JoinVoice extends Commando.Command {
             if(!message.guild.voiceConnection) {
                 message.member.voiceChannel.join().then((connection) => {
                     //joined channel
+                    message.channel.send("Joined voice channel: " + message.member.voiceChannel.name);
                     console.log("Joined voice: " + message.member.voiceChannel.name);
                 }).catch(error => {
                     console.log(error);
