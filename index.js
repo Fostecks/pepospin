@@ -1,5 +1,5 @@
 const Commando = require("discord.js-commando");
-const {token} = require('./config.json') 
+const {token, BOT_CLIENT_ID} = require('./config.json') 
 
 const bot = new Commando.Client({
     disableEveryone: true,
@@ -8,6 +8,7 @@ const bot = new Commando.Client({
 const BOT_COMMAND_CHANNEL_NAME = "dev";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const radioMap = {};
+let botMessage;
 
 
 /** 
@@ -47,25 +48,37 @@ bot.on('ready', async () => {
 bot.login(token);
 
 bot.on('message', (message) => {
-    //is message a command
-    if(message.content.startsWith('!')) {
+    // return;
+    //is message in bot channel
+    if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
 
-        //is message in bot channel
-        if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
-            message.channel.fetchMessages().then((messages) => {
-                messages = messages.array().filter(x => x.id !== message.id);
-                for(const message of messages) {
-                    message.delete();
-                }
-            })
+        //keep latest command message
+        if(message.content.startsWith("!")) {
+            commandMessage = message;
         }
-        //is message not in bot channel
+        //keep latest bot reply
+        else if(message.author.id === BOT_CLIENT_ID) {
+            botMessage = message;
+        }
+        //delete non-commands in bot channel
         else {
             message.delete();
         }
+        
+        //delete every other message
+        message.channel.fetchMessages().then((messages) => {
+            let messagesToDelete = messages.array().filter(x => {
+                let isLastCommandMessage = x.id === commandMessage.id;
+                let isLastBotMessage = botMessage && x.id === botMessage.id;
+                return !isLastCommandMessage && !isLastBotMessage;
+            });
+            for(const message of messagesToDelete) {
+                message.delete();
+            }
+        })
     }
-    //is message not a command message in bot channel
-    else if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
+    //is message not in bot channel
+    else {
         message.delete();
     }
 });
