@@ -9,6 +9,8 @@ const BOT_COMMAND_CHANNEL_NAME = "dev";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const radioMap = {};
 let botMessage;
+let commandMessage;
+let messagePurgePromise;
 
 
 /** 
@@ -47,8 +49,13 @@ bot.on('ready', async () => {
 
 bot.login(token);
 
-bot.on('message', (message) => {
-    // return;
+bot.on('message', async (message) => {
+    //await pending deletes
+    // if(messagePurgePromise) {
+    //     await messagePurgePromise;
+    //     messagePurgePromise = null;
+    // }
+
     //is message in bot channel
     if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
 
@@ -60,26 +67,19 @@ bot.on('message', (message) => {
         else if(message.author.id === BOT_CLIENT_ID) {
             botMessage = message;
         }
-        //delete non-commands in bot channel
-        else {
-            message.delete();
-        }
         
         //delete every other message
-        message.channel.fetchMessages().then((messages) => {
+        message.channel.fetchMessages().then(async (messages) => {
             let messagesToDelete = messages.array().filter(x => {
-                let isLastCommandMessage = x.id === commandMessage.id;
+                let isLastCommandMessage = commandMessage && x.id === commandMessage.id;
                 let isLastBotMessage = botMessage && x.id === botMessage.id;
                 return !isLastCommandMessage && !isLastBotMessage;
             });
-            for(const message of messagesToDelete) {
-                message.delete();
-            }
+
+            // messagePurgePromise = Promise.all(messagesToDelete.map(message => message.delete()));
+            
+            message.channel.bulkDelete(messagesToDelete);
         })
-    }
-    //is message not in bot channel
-    else {
-        message.delete();
     }
 });
 
