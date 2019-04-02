@@ -1,6 +1,7 @@
 const Commando = require("discord.js-commando");
 const indexExports = require("../../index.js");
 const Player = require("../../player.js");
+const utils = require("../../utils.js");
 
 
 /** 
@@ -32,7 +33,8 @@ class Play extends Commando.Command {
         let radioMap = indexExports.getMap();
         if(radioMap && connection && args) {
             let linkArray = radioMap[args];
-            await player.playArray(linkArray, connection, message.channel).then(() => {
+            let shuffledLinkArray = utils.shuffleArray(linkArray);
+            await player.playArray(shuffledLinkArray, connection, message.channel).then(() => {
                 if(indexExports.bot.killCommand === false) {
                     connection.disconnect();
                 }
