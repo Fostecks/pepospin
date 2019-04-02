@@ -83,7 +83,7 @@ class Play extends Commando.Command {
                     .setThumbnail(videoMetadata.videoInfo.thumbnail_url)
                     .setColor(0xFF0000)
                     .setFooter(videoMetadata.videoFormat.audioBitrate + "kbps • " + 
-                        videoMetadata.videoFormat.audio_sample_rate + " Hz • codec: " + 
+                        videoMetadata.videoFormat.audio_sample_rate / 1000 + " kHz • codec: " + 
                         videoMetadata.videoFormat.audioEncoding);
 
                 message.doNotDelete = true;
