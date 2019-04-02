@@ -79,7 +79,8 @@ class Play extends Commando.Command {
 
                 await videoMetadataPromise;
                 let richText = new discord.RichEmbed()
-                    .addField("Now Playing " + videoMetadata.videoInfo.title)
+                    .addField("Now Playing", videoMetadata.videoInfo.title)
+                    .setThumbnail(videoMetadata.videoInfo.thumbnail_url)
                     .setColor(0xFF0000)
                     .setFooter(videoMetadata.videoFormat.audioBitrate + "kbps • " + 
                         videoMetadata.videoFormat.audio_sample_rate + " Hz • codec: " + 
