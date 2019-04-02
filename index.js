@@ -31,7 +31,7 @@ bot.on('ready', async () => {
             if(messageArray.length === 0) return;
             let linkCollection = collectLinks(messageArray);
             let channelName = messageArray[0].channel.name;
-            if(linkCollection) {
+            if(linkCollection && linkCollection.length > 0) {
                 radioMap[channelName] = linkCollection;
             }
         })
