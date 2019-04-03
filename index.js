@@ -5,7 +5,7 @@ const bot = new Commando.Client({
     disableEveryone: true,
     unknownCommandResponse: false
 });
-const BOT_COMMAND_CHANNEL_NAME = "dev";
+const BOT_COMMAND_CHANNEL_NAME = "bot";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const radioMap = {};
 let botMessage;
@@ -19,8 +19,8 @@ let commandMessage;
  */
 bot.on('ready', async () => {
     
-    let textChannels = bot.guilds.first().channels
-        .filter(channel => channel.type === "text");
+    let textChannels = bot.guilds.find(guild => guild.name === "Underground Radio")
+    .channels.filter(channel => channel.type === "text");
 
     const constructRadioMapPromise = Promise.all(textChannels
         .filter(textChannel => !textChannelBlacklist.includes(textChannel.name))
