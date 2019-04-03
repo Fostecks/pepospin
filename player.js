@@ -67,9 +67,12 @@ class Player {
      * @param {TextChannel} channel target channel to post messages with video metadata
      */
     async playArray(linkArray, connection, channel) {
+        this._activeLinkArray = linkArray;
         this._activeQueue = new Promise(async (queueResolve, queueReject) => {
             // Audio play loop
-            for(const link of linkArray) {
+            for(this.activeIndex = 0; this.activeIndex < linkArray.length; this.activeIndex++) {
+                let link = linkArray[this.activeIndex];
+
                 //check if something tried to force quit queue
                 if(indexExports.bot.killCommand === true) {
                     break;
@@ -95,6 +98,15 @@ class Player {
         indexExports.bot.killCommand = true;
         await this._activeQueue;
         indexExports.bot.killCommand = false;
+    }
+
+    getActiveLinkArray() {
+        return this._activeLinkArray;
+    }
+
+    repeatCurrentTrack() {
+        let currentTrack = this._activeLinkArray[this.activeIndex];
+        this._activeLinkArray.splice(this.activeIndex, 0, currentTrack);
     }
 }
 

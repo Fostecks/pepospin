@@ -31,7 +31,7 @@ bot.on('ready', async () => {
             if(messageArray.length === 0) return;
             let linkCollection = collectLinks(messageArray);
             let channelName = messageArray[0].channel.name;
-            if(linkCollection) {
+            if(linkCollection && linkCollection.length > 0) {
                 radioMap[channelName] = linkCollection;
             }
         })
@@ -80,7 +80,7 @@ bot.on('message', async (message) => {
  */
 function collectLinks(messageArray) {
     let linkCollection = [];
-    let linkRegex = /https:\/\/[a-zA-Z.0-9\/?=&-_]+/g;
+    let linkRegex = /https:\/\/(www\.)?(youtube.com|youtu.be)[a-zA-Z.0-9\/?=&-_]+/g;
     for(let i = 0; i < messageArray.length; i++) {
         let message = messageArray[i].content;
         let links = message.match(linkRegex);
