@@ -6,7 +6,7 @@ const utils = require("../../utils.js");
 /** 
  * Bot command to make discord bot start streaming youtube audio
  * into its connected voice channel using youtube links from
- * a given text channel name. Requires bot to be connected to a 
+ * a random text channel. Requires bot to be connected to a 
  * voice channel.
  */
 class Random extends Commando.Command {
@@ -30,7 +30,7 @@ class Random extends Commando.Command {
         var keys = Object.keys(radioMap)
         let randomRadio = keys[ keys.length * Math.random() << 0];
         let connection = message.guild.voiceConnection;
-        if(radioMap && randomRadio) {
+        if(radioMap && randomRadio && connection) {
             let linkArray = radioMap[randomRadio];
             utils.play(linkArray, connection, message.channel);
         }
