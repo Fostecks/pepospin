@@ -17,6 +17,7 @@ class PlayAll extends Commando.Command {
             group: "cmd",
             memberName: "playall",
             description: "play a mix from all radio channels",
+            guildOnly: true
         });
     }
 
