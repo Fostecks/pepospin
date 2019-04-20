@@ -12,6 +12,7 @@ class LeaveVoice extends Commando.Command {
             group: "cmd",
             memberName: "leave",
             description: "leave voice channel",
+            guildOnly: true
         });
     }
 

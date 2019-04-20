@@ -17,6 +17,7 @@ class Skip extends Commando.Command {
             group: "cmd",
             memberName: "skip",
             description: "skip current track",
+            guildOnly: true
         });
     }
 

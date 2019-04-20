@@ -17,6 +17,7 @@ class Play extends Commando.Command {
             group: "cmd",
             memberName: "play",
             description: "play requested radio channel",
+            guildOnly: true
         });
     }
 

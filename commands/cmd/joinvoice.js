@@ -11,6 +11,8 @@ class JoinVoice extends Commando.Command {
             group: "cmd",
             memberName: "join",
             description: "Join voice channel of commander",
+            guildOnly: true
+
         });
     }
 

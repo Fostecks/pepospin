@@ -17,6 +17,7 @@ class Random extends Commando.Command {
             group: "cmd",
             memberName: "random",
             description: "play random radio channel",
+            guildOnly: true
         });
     }
 
