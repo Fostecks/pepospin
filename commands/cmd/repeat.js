@@ -25,6 +25,7 @@ class Repeat extends Commando.Command {
      * @param {String} args 
      */
     async run(message, args) {
+        console.log("Repeat invoked, repeating current track after it completes");
         let player = new Player().getInstance();
         player.repeatCurrentTrack();
     }
