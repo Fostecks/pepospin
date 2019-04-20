@@ -5,11 +5,20 @@ const bot = new Commando.Client({
     disableEveryone: true,
     unknownCommandResponse: false
 });
-const BOT_COMMAND_CHANNEL_NAME = "bot";
+
+const PRIMARY_DISCORD_GUILD_NAME = "Underground Radio"
+const BOT_CHANNEL_NAME = "bot";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const radioMap = {};
-let botMessage;
-let commandMessage;
+let latestBotMessage;
+let latestCommandMessage;
+
+
+bot.login(token);
+
+/*********************
+ *   EVENT HANDLERS  *
+ ********************/
 
 /** 
  * Listener method for Discord bot's 'ready' lifecycle event. 
@@ -18,9 +27,8 @@ let commandMessage;
  * Also registers commando.js commands under ./cmd/commands dir
  */
 bot.on('ready', async () => {
-    
-    let textChannels = bot.guilds.find(guild => guild.name === "Underground Radio")
-    .channels.filter(channel => channel.type === "text");
+    bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === PRIMARY_DISCORD_GUILD_NAME);
+    let textChannels = bot.primaryDiscordGuild.channels.filter(channel => channel.type === "text");
 
     const constructRadioMapPromise = Promise.all(textChannels
         .filter(textChannel => !textChannelBlacklist.includes(textChannel.name))
@@ -43,35 +51,63 @@ bot.on('ready', async () => {
     bot.registry.registerCommandsIn(__dirname + '/commands');   
 
     console.log("bot ready");
-});
 
-bot.login(token);
+    //pin message with bot commands if there isn't one already
+    let botChannel = bot.primaryDiscordGuild.channels.find(channel => channel.name === BOT_CHANNEL_NAME);
+    botChannel.fetchPinnedMessages().then(messages => {
+        if(!messages || !messages.size) {
+            pinHelpMessage(botChannel);
+        }
+    })
+    
+});
 
 bot.on('message', async (message) => {
     //is message in bot channel
-    if(message.channel.name === BOT_COMMAND_CHANNEL_NAME) {
+    if(message.channel.name === BOT_CHANNEL_NAME) {
 
         //keep latest command message
         if(message.content.startsWith("!")) {
-            commandMessage = message;
+            latestCommandMessage = message;
         }
         //keep latest bot reply
         else if(message.author.id === BOT_CLIENT_ID) {
-            botMessage = message;
+            latestBotMessage = message;
         }
         
         //delete every other message
         message.channel.fetchMessages().then(async (messages) => {
             let messagesToDelete = messages.array().filter(x => {
-                let isLastCommandMessage = commandMessage && x.id === commandMessage.id;
-                let isLastBotMessage = botMessage && x.id === botMessage.id;
-                return !isLastCommandMessage && !isLastBotMessage;
+                let isLastCommandMessage = latestCommandMessage && x.id === latestCommandMessage.id;
+                let isLastBotMessage = latestBotMessage && x.id === latestBotMessage.id;
+                return !isLastCommandMessage && !isLastBotMessage && !x.pinned;
             });
 
             message.channel.bulkDelete(messagesToDelete);
         })
     }
 });
+
+/**********************
+ *  PRIVATE HELPERS   *
+ *********************/
+
+function pinHelpMessage(channel) {
+    let helpMessage = "```css\n" +
+    "[COMMANDS]\n" +
+    "1. !join : Joins your voice channel\n" +
+    "2. !play <channel> : plays Youtube links from <channel>\n" +
+    "3. !random : plays a random <channel>\n" +
+    "4. !playall : plays links from every channel\n" +
+    "5. !skip : skips currently playing link and plays next link\n" +
+    "6. !repeat : play currently playing link again when it ends\n" +
+    "7. !leave: end audio stream and leave voice channel\n" +
+    "```";
+    channel.send(helpMessage).then(message => {
+        message.pin();
+    });
+}
+
 
 /**
  * Given an array containing discord.js Messages, harvests links
