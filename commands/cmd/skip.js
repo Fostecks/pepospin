@@ -26,6 +26,7 @@ class Skip extends Commando.Command {
      * @param {String} args 
      */
     async run(message, args) {
+        console.log("Skip invoked, shifting queue...")
         let player = new Player().getInstance();
         player.forceShiftQueue();
     }
