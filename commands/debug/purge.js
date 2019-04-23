@@ -2,14 +2,14 @@ const Commando = require("discord.js-commando");
 const indexExports = require("../../index.js");
 
 
-class Printout extends Commando.Command {
+class Purge extends Commando.Command {
 
     constructor(client) { 
         super(client, {
-            name: "printout",
+            name: "purge",
             group: "debug",
-            memberName: "printout",
-            description: "printout",
+            memberName: "purge",
+            description: "purge",
             guildOnly: true
         });
     }
@@ -20,15 +20,12 @@ class Printout extends Commando.Command {
      * @param {String} args 
      */
     async run(message, args) {
+        message.channel.send("Reconstructing radio map...");
         let radioMap = indexExports.getMap();
-        let radioString = ""; 
-        
-        for(let key of Object.keys(radioMap)) {
-            radioString += key + ": " + radioMap[key].length + "\n";
-        }
-
-        message.channel.send(radioString);
+        radioMap = {};
+        await indexExports.constructRadioMap();
+        message.channel.send("Done");
     }
 }
 
-module.exports = Printout;
+module.exports = Purge;
