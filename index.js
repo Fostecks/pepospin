@@ -27,6 +27,7 @@ bot.login(token);
  ***********/
 bot.on('ready', async () => {
     await constructRadioMap();
+    bot.birthdate = Date.now();
     bot.registry.registerGroup("cmd", "Commands");
     bot.registry.registerGroup("debug", "Debug");
     bot.registry.registerDefaults();
@@ -164,6 +165,8 @@ bot.on('channelDelete', deletedChannel => {
  *******************************/
 
 function constructRadioMap() {
+    let time1 = Date.now();
+    console.log("Constructing radio map...")
     radioMap = {};
     bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === PRIMARY_DISCORD_GUILD_NAME);
     let textChannels = bot.primaryDiscordGuild.channels.filter(channel => channel.type === "text");
@@ -181,6 +184,9 @@ function constructRadioMap() {
                 radioMap[channelName] = linkCollection;
             }
         })
+        let time2 = Date.now();
+        let time = time2 - time1;
+        console.log("Completed constructing radio map in " + time + " ms.")
     });
 
     return constructRadioMapPromise;
