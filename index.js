@@ -112,13 +112,17 @@ bot.on('message', async (message) => {
  ********************/
 bot.on('messageUpdate', (oldMessage, newMessage) => {
     if(oldMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(oldMessage.channel.name === BOT_CHANNEL_NAME) return;
 
     // delete old links
+    if(!oldMessage) return;
     let oldLinks = oldMessage.content.match(LINK_REGEX);
-    for(oldLink of oldLinks) {
-        let oldLinkIndex = radioMap[oldMessage.channel.name].indexOf(oldLink);
-        if(oldLinkIndex > -1 ) {
-            radioMap[oldMessage.channel.name].splice(oldLinkIndex, 1);
+    if (oldLinks) {
+        for(oldLink of oldLinks) {
+            let oldLinkIndex = radioMap[oldMessage.channel.name].indexOf(oldLink);
+            if(oldLinkIndex > -1 ) {
+                radioMap[oldMessage.channel.name].splice(oldLinkIndex, 1);
+            }
         }
     }
 
@@ -147,13 +151,16 @@ bot.on('channelUpdate', (oldChannel, newChannel) => {
  ********************/
 bot.on('messageDelete', deletedMessage => {
     if(deletedMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(deletedMessage.channel.name === BOT_CHANNEL_NAME) return;
 
     // delete old links
     let oldLinks = deletedMessage.content.match(LINK_REGEX);
-    for(oldLink of oldLinks) {
-        let oldLinkIndex = radioMap[deletedMessage.channel.name].indexOf(oldLink);
-        if(oldLinkIndex > -1 ) {
-            radioMap[deletedMessage.channel.name].splice(oldLinkIndex, 1);
+    if (oldLinks) {
+        for(oldLink of oldLinks) {
+            let oldLinkIndex = radioMap[deletedMessage.channel.name].indexOf(oldLink);
+            if(oldLinkIndex > -1 ) {
+                radioMap[deletedMessage.channel.name].splice(oldLinkIndex, 1);
+            }
         }
     }
 });
