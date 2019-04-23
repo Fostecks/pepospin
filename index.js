@@ -79,11 +79,11 @@ bot.on('message', async (message) => {
             let links = message.content.match(LINK_REGEX);
             if(links) {
                 if(message.channel.name in radioMap) {
-                    console.log("Found new link(s) under channel " + message.channel.name);
+                    console.log("Message added in " + message.channel.name + ": Adding link(s): " + links);
                     radioMap[message.channel.name] = radioMap[message.channel.name].concat(links);
                 }
                 else {
-                    console.log("Found new link(s) under new channel " + message.channel.name);
+                    console.log("Message added in NEW channel " + message.channel.name + ": Adding link(s): " + links);
                     radioMap[message.channel.name] = links;
                 }
             }
@@ -106,6 +106,7 @@ bot.on('messageUpdate', (oldMessage, newMessage) => {
             let oldLinkIndex = radioMap[oldMessage.channel.name].indexOf(oldLink);
             if(oldLinkIndex > -1 ) {
                 radioMap[oldMessage.channel.name].splice(oldLinkIndex, 1);
+                console.log("Message updated in " + oldMessage.channel.name + ": Deleted a link: " + oldLink);
             }
         }
     }
@@ -114,6 +115,7 @@ bot.on('messageUpdate', (oldMessage, newMessage) => {
     let newLinks = newMessage.content.match(LINK_REGEX);
     if(newLinks) {
         radioMap[newMessage.channel.name] = radioMap[newMessage.channel.name].concat(newLinks);
+        console.log("Message updated in " + newMessage.channel.name + ": Adding new link(s): " + newLinks);
     }
 });
 
@@ -124,9 +126,14 @@ bot.on('channelUpdate', (oldChannel, newChannel) => {
     if(oldChannel.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
 
     if(oldChannel.name !== newChannel.name) {
-        if(radioMap[newChannel.name] !== undefined) return;
+        if(radioMap[newChannel.name] !== undefined) {
+            console.log("WARNING: Duplicate channel: " + newChannel.name + ". RadioMap has become out of sync. A purge is required.");
+            return;
+        };
         radioMap[newChannel.name] = radioMap[oldChannel.name];
         delete radioMap[oldChannel.name];
+
+        console.log("Updated radioMap channel: " + oldChannel.name + " with new name: " + newChannel.name); 
     }
 });
 
@@ -144,6 +151,7 @@ bot.on('messageDelete', deletedMessage => {
             let oldLinkIndex = radioMap[deletedMessage.channel.name].indexOf(oldLink);
             if(oldLinkIndex > -1 ) {
                 radioMap[deletedMessage.channel.name].splice(oldLinkIndex, 1);
+                console.log("Message deleted in " + deletedMessage.channel.name + ": Deleted a link: " + oldLink);
             }
         }
     }
@@ -158,6 +166,8 @@ bot.on('channelDelete', deletedChannel => {
     if(radioMap[deletedChannel.name] === undefined) return;
     
     delete radioMap[deletedChannel.name];
+    console.log("Deleted channel from radioMap: " + deletedChannel.name);
+
 });
 
 /********************************
