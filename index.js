@@ -3,50 +3,33 @@ const {token, BOT_CLIENT_ID} = require('./config.json')
 
 const bot = new Commando.Client({
     disableEveryone: true,
-    unknownCommandResponse: false
+    unknownCommandResponse: false,
 });
 
-const PRIMARY_DISCORD_GUILD_NAME = "Underground Radio"
+const PRIMARY_DISCORD_GUILD_NAME = "Underground Radio";
 const BOT_CHANNEL_NAME = "bot";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
-const radioMap = {};
+const LINK_REGEX = /https:\/\/(www\.)?(youtube.com|youtu.be)[a-zA-Z.0-9\/?=&-_]+/g;
+let radioMap = {};
 let latestBotMessage;
 let latestCommandMessage;
 
 
 bot.login(token);
 
-/*********************
- *   EVENT HANDLERS  *
- ********************/
+/*******************************
+ *        EVENT HANDLERS       *
+ *   responsible for radioMap  *
+ ******************************/
 
-/** 
- * Listener method for Discord bot's 'ready' lifecycle event. 
- * On ready, fetches all messages in bot's guild and constructs 
- * a map of radio text channels to youtube links in that text channel. 
- * Also registers commando.js commands under ./cmd/commands dir
- */
+/************
+ * ON READY *
+ ***********/
 bot.on('ready', async () => {
-    bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === PRIMARY_DISCORD_GUILD_NAME);
-    let textChannels = bot.primaryDiscordGuild.channels.filter(channel => channel.type === "text");
-
-    const constructRadioMapPromise = Promise.all(textChannels
-        .filter(textChannel => !textChannelBlacklist.includes(textChannel.name))
-        .map(textChannel =>  textChannel.fetchMessages())
-    ).then(allMessages => {
-        allMessages.forEach(channelMessages => {
-            let messageArray = channelMessages.array();
-            if(messageArray.length === 0) return;
-            let linkCollection = collectLinks(messageArray);
-            let channelName = messageArray[0].channel.name;
-            if(linkCollection && linkCollection.length > 0) {
-                radioMap[channelName] = linkCollection;
-            }
-        })
-    });
-
-    await constructRadioMapPromise;
+    await constructRadioMap();
+    bot.birthdate = Date.now();
     bot.registry.registerGroup("cmd", "Commands");
+    bot.registry.registerGroup("debug", "Debug");
     bot.registry.registerDefaults();
     bot.registry.registerCommandsIn(__dirname + '/commands');   
 
@@ -62,7 +45,11 @@ bot.on('ready', async () => {
     
 });
 
+/******************
+ * ON NEW MESSAGE *
+ *****************/
 bot.on('message', async (message) => {
+    if(!message.guild || message.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
     //is message in bot channel
     if(message.channel.name === BOT_CHANNEL_NAME) {
 
@@ -86,11 +73,134 @@ bot.on('message', async (message) => {
             message.channel.bulkDelete(messagesToDelete);
         })
     }
+    //else if message is a new song in a radio channel
+    else {
+        if(!textChannelBlacklist.includes(message.channel.name)) {
+            let links = message.content.match(LINK_REGEX);
+            if(links) {
+                if(message.channel.name in radioMap) {
+                    console.log("Message added in " + message.channel.name + ": Adding link(s): " + links);
+                    radioMap[message.channel.name] = radioMap[message.channel.name].concat(links);
+                }
+                else {
+                    console.log("Message added in NEW channel " + message.channel.name + ": Adding link(s): " + links);
+                    radioMap[message.channel.name] = links;
+                }
+            }
+        }
+    }
 });
 
-/**********************
- *  PRIVATE HELPERS   *
- *********************/
+/*********************
+ * ON MESSAGE UPDATE *
+ ********************/
+bot.on('messageUpdate', (oldMessage, newMessage) => {
+    if(!oldMessage.guild || oldMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(oldMessage.channel.name === BOT_CHANNEL_NAME) return;
+
+    // delete old links
+    if(!oldMessage) return;
+    let oldLinks = oldMessage.content.match(LINK_REGEX);
+    if (oldLinks) {
+        for(oldLink of oldLinks) {
+            let oldLinkIndex = radioMap[oldMessage.channel.name].indexOf(oldLink);
+            if(oldLinkIndex > -1 ) {
+                radioMap[oldMessage.channel.name].splice(oldLinkIndex, 1);
+                console.log("Message updated in " + oldMessage.channel.name + ": Deleted a link: " + oldLink);
+            }
+        }
+    }
+
+    //add new links
+    let newLinks = newMessage.content.match(LINK_REGEX);
+    if(newLinks) {
+        radioMap[newMessage.channel.name] = radioMap[newMessage.channel.name].concat(newLinks);
+        console.log("Message updated in " + newMessage.channel.name + ": Adding new link(s): " + newLinks);
+    }
+});
+
+/*********************
+ * ON CHANNEL UPDATE *
+ ********************/
+bot.on('channelUpdate', (oldChannel, newChannel) => {
+    if(oldChannel.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+
+    if(oldChannel.name !== newChannel.name) {
+        if(radioMap[newChannel.name] !== undefined) {
+            console.log("WARNING: Duplicate channel: " + newChannel.name + ". RadioMap has become out of sync. A purge is required.");
+            return;
+        };
+        radioMap[newChannel.name] = radioMap[oldChannel.name];
+        delete radioMap[oldChannel.name];
+
+        console.log("Updated radioMap channel: " + oldChannel.name + " with new name: " + newChannel.name); 
+    }
+});
+
+/*********************
+ * ON MESSAGE DELETE *
+ ********************/
+bot.on('messageDelete', deletedMessage => {
+    if(!deletedMessage.guild || deletedMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(deletedMessage.channel.name === BOT_CHANNEL_NAME) return;
+
+    // delete old links
+    let oldLinks = deletedMessage.content.match(LINK_REGEX);
+    if (oldLinks) {
+        for(oldLink of oldLinks) {
+            let oldLinkIndex = radioMap[deletedMessage.channel.name].indexOf(oldLink);
+            if(oldLinkIndex > -1 ) {
+                radioMap[deletedMessage.channel.name].splice(oldLinkIndex, 1);
+                console.log("Message deleted in " + deletedMessage.channel.name + ": Deleted a link: " + oldLink);
+            }
+        }
+    }
+});
+
+/*********************
+ * ON CHANNEL DELETE *
+ ********************/
+bot.on('channelDelete', deletedChannel => {
+    if(deletedChannel.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+
+    if(radioMap[deletedChannel.name] === undefined) return;
+    
+    delete radioMap[deletedChannel.name];
+    console.log("Deleted channel from radioMap: " + deletedChannel.name);
+
+});
+
+/********************************
+ *        PRIVATE HELPERS       *
+ *******************************/
+
+function constructRadioMap() {
+    let time1 = Date.now();
+    console.log("Constructing radio map...")
+    radioMap = {};
+    bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === PRIMARY_DISCORD_GUILD_NAME);
+    let textChannels = bot.primaryDiscordGuild.channels.filter(channel => channel.type === "text");
+
+    const constructRadioMapPromise = Promise.all(textChannels
+        .filter(textChannel => !textChannelBlacklist.includes(textChannel.name))
+        .map(textChannel =>  textChannel.fetchMessages())
+    ).then(allMessages => {
+        allMessages.forEach(channelMessages => {
+            let messageArray = channelMessages.array();
+            if(messageArray.length === 0) return;
+            let linkCollection = collectLinks(messageArray);
+            let channelName = messageArray[0].channel.name;
+            if(linkCollection && linkCollection.length > 0) {
+                radioMap[channelName] = linkCollection;
+            }
+        })
+        let time2 = Date.now();
+        let time = time2 - time1;
+        console.log("Completed constructing radio map in " + time + " ms.")
+    });
+
+    return constructRadioMapPromise;
+}
 
 function pinHelpMessage(channel) {
     let helpMessage = "```css\n" +
@@ -116,10 +226,9 @@ function pinHelpMessage(channel) {
  */
 function collectLinks(messageArray) {
     let linkCollection = [];
-    let linkRegex = /https:\/\/(www\.)?(youtube.com|youtu.be)[a-zA-Z.0-9\/?=&-_]+/g;
     for(let i = 0; i < messageArray.length; i++) {
         let message = messageArray[i].content;
-        let links = message.match(linkRegex);
+        let links = message.match(LINK_REGEX);
         if(links) {
             linkCollection = linkCollection.concat(links);
         }
@@ -133,5 +242,6 @@ function getMap() {
 
 module.exports = {
     "bot": bot,
-    "getMap": getMap
+    "getMap": getMap,
+    "constructRadioMap": constructRadioMap
 }
