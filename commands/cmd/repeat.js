@@ -16,6 +16,7 @@ class Repeat extends Commando.Command {
             group: "cmd",
             memberName: "repeat",
             description: "replay current track after it finishes",
+            guildOnly: true
         });
     }
 
