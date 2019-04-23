@@ -7,7 +7,7 @@ class Print extends Commando.Command {
     constructor(client) { 
         super(client, {
             name: "print",
-            group: "cmd",
+            group: "debug",
             memberName: "print",
             description: "print",
             guildOnly: true
@@ -20,6 +20,10 @@ class Print extends Commando.Command {
      * @param {String} args 
      */
     async run(message, args) {
+        if(!args) {
+            message.send("Need channel name argument.");
+            return;
+        }
         let radioMap = indexExports.getMap();
         let radioString = "["; 
         let linkArray = radioMap[args];
@@ -27,7 +31,7 @@ class Print extends Commando.Command {
         for(let link of linkArray) {
             radioString += link + ", \n";
         }
-        radioString += "\b]"
+        radioString += "]"
 
         message.channel.send(radioString);
     }

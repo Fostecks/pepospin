@@ -6,11 +6,11 @@ const bot = new Commando.Client({
     unknownCommandResponse: false,
 });
 
-const PRIMARY_DISCORD_GUILD_NAME = "thisisatestserver";
+const PRIMARY_DISCORD_GUILD_NAME = "Underground Radio";
 const BOT_CHANNEL_NAME = "bot";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const LINK_REGEX = /https:\/\/(www\.)?(youtube.com|youtu.be)[a-zA-Z.0-9\/?=&-_]+/g;
-const radioMap = {};
+let radioMap = {};
 let latestBotMessage;
 let latestCommandMessage;
 
@@ -26,26 +26,9 @@ bot.login(token);
  * ON READY *
  ***********/
 bot.on('ready', async () => {
-    bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === PRIMARY_DISCORD_GUILD_NAME);
-    let textChannels = bot.primaryDiscordGuild.channels.filter(channel => channel.type === "text");
-
-    const constructRadioMapPromise = Promise.all(textChannels
-        .filter(textChannel => !textChannelBlacklist.includes(textChannel.name))
-        .map(textChannel =>  textChannel.fetchMessages())
-    ).then(allMessages => {
-        allMessages.forEach(channelMessages => {
-            let messageArray = channelMessages.array();
-            if(messageArray.length === 0) return;
-            let linkCollection = collectLinks(messageArray);
-            let channelName = messageArray[0].channel.name;
-            if(linkCollection && linkCollection.length > 0) {
-                radioMap[channelName] = linkCollection;
-            }
-        })
-    });
-
-    await constructRadioMapPromise;
+    await constructRadioMap();
     bot.registry.registerGroup("cmd", "Commands");
+    bot.registry.registerGroup("debug", "Debug");
     bot.registry.registerDefaults();
     bot.registry.registerCommandsIn(__dirname + '/commands');   
 
@@ -65,7 +48,7 @@ bot.on('ready', async () => {
  * ON NEW MESSAGE *
  *****************/
 bot.on('message', async (message) => {
-    if(message.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(!message.guild || message.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
     //is message in bot channel
     if(message.channel.name === BOT_CHANNEL_NAME) {
 
@@ -111,7 +94,7 @@ bot.on('message', async (message) => {
  * ON MESSAGE UPDATE *
  ********************/
 bot.on('messageUpdate', (oldMessage, newMessage) => {
-    if(oldMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(!oldMessage.guild || oldMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
     if(oldMessage.channel.name === BOT_CHANNEL_NAME) return;
 
     // delete old links
@@ -140,9 +123,9 @@ bot.on('channelUpdate', (oldChannel, newChannel) => {
     if(oldChannel.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
 
     if(oldChannel.name !== newChannel.name) {
-        if(radioMap[newChannel] !== undefined) return;
-        radioMap[newChannel] = radioMap[oldChannel];
-        delete radioMap[oldChannel];
+        if(radioMap[newChannel.name] !== undefined) return;
+        radioMap[newChannel.name] = radioMap[oldChannel.name];
+        delete radioMap[oldChannel.name];
     }
 });
 
@@ -150,7 +133,7 @@ bot.on('channelUpdate', (oldChannel, newChannel) => {
  * ON MESSAGE DELETE *
  ********************/
 bot.on('messageDelete', deletedMessage => {
-    if(deletedMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(!deletedMessage.guild || deletedMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
     if(deletedMessage.channel.name === BOT_CHANNEL_NAME) return;
 
     // delete old links
@@ -171,14 +154,37 @@ bot.on('messageDelete', deletedMessage => {
 bot.on('channelDelete', deletedChannel => {
     if(deletedChannel.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
 
-    if(radioMap[deletedChannel] === undefined) return;
+    if(radioMap[deletedChannel.name] === undefined) return;
     
-    delete radioMap[deletedChannel];
+    delete radioMap[deletedChannel.name];
 });
 
 /********************************
  *        PRIVATE HELPERS       *
  *******************************/
+
+function constructRadioMap() {
+    radioMap = {};
+    bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === PRIMARY_DISCORD_GUILD_NAME);
+    let textChannels = bot.primaryDiscordGuild.channels.filter(channel => channel.type === "text");
+
+    const constructRadioMapPromise = Promise.all(textChannels
+        .filter(textChannel => !textChannelBlacklist.includes(textChannel.name))
+        .map(textChannel =>  textChannel.fetchMessages())
+    ).then(allMessages => {
+        allMessages.forEach(channelMessages => {
+            let messageArray = channelMessages.array();
+            if(messageArray.length === 0) return;
+            let linkCollection = collectLinks(messageArray);
+            let channelName = messageArray[0].channel.name;
+            if(linkCollection && linkCollection.length > 0) {
+                radioMap[channelName] = linkCollection;
+            }
+        })
+    });
+
+    return constructRadioMapPromise;
+}
 
 function pinHelpMessage(channel) {
     let helpMessage = "```css\n" +
@@ -220,5 +226,6 @@ function getMap() {
 
 module.exports = {
     "bot": bot,
-    "getMap": getMap
+    "getMap": getMap,
+    "constructRadioMap": constructRadioMap
 }
