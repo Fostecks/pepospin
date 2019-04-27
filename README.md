@@ -12,6 +12,7 @@ intended features:
 
 Running:
 - check out repo
+- install [ffmpeg](http://ffmpeg.org/download.html)
 - npm install
 - node .
 - discord test server: https://discord.gg/ufXtmUF
