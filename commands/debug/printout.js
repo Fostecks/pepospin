@@ -29,7 +29,7 @@ class Printout extends Commando.Command {
             radioString += key + ": " + radioMap[key].length + "\n";
         }
 
-        message.channel.send(radioString);
+        message.channel.send(radioString.substring(0, 1999));
     }
 }
 

@@ -25,15 +25,14 @@ class Print extends Commando.Command {
             return;
         }
         let radioMap = indexExports.getMap();
-        let radioString = "["; 
+        let radioString = ""; 
         let linkArray = radioMap[args];
 
         for(let link of linkArray) {
-            radioString += link + ", \n";
+            radioString += link + "\n";
         }
-        radioString += "]"
-
-        message.channel.send(radioString);
+        
+        message.channel.send(radioString.substring(0, 1999));
     }
 }
 
