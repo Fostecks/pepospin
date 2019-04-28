@@ -30,12 +30,22 @@ class Player {
     /** 
      * Plays a youtube link as an audio stream into a voiceConnection. 
      * Sets bot activity as "Playing <title>"
-     * @param {String} trackID full youtube link as a string
+     * @param {String} trackUrl full youtube link as a string
      * @param {VoiceConnection} connection discord guild VoiceConnection object
      */
-    async _play(trackID, connection) {
+    async _play(trackUrl, connection) {
         this._resetVideoMetadataPromise();
-        let ytdl = YTDL(trackID, {filter: "audio", quality: "highestaudio"});
+
+        let options = {filter: "audio", quality: "highestaudio"};
+
+        // capture timestamp, if any
+        if(trackUrl.indexOf("&t=") > -1) {
+            let timeString = trackUrl.match(/(?<=&t=)[0-9]+/)[0];
+            options.begin = parseInt(timeString)*1000;
+        }
+
+        let ytdl = YTDL(trackUrl, options);
+
         ytdl.on('info', (videoInfo, videoFormat) => {
             console.log("Audio encoding: " + videoFormat.audioEncoding);
             console.log("Audio bitrate: " + videoFormat.audioBitrate);
