@@ -31,7 +31,8 @@ class Play extends Commando.Command {
         let connection = message.guild.voiceConnection;
         if(radioMap && connection && args) {
             let linkArray = radioMap[args];
-            utils.play(linkArray, connection, message.channel);
+            let shuffledLinkArray = utils.shuffleArray(linkArray);
+            utils.play(shuffledLinkArray, connection, message.channel);
         }
     }
 }
