@@ -26,7 +26,7 @@ class Uptime extends Commando.Command {
         let hours = parseInt((now - botStart)/(60*60*1000)) % 24;
         let minutes = parseInt((now - botStart)/(60*1000)) % 60;
         let seconds = parseInt((now - botStart)/(1000)) % 60;
-      
+
         let uptimeString = "";
         if(days) uptimeString += days + " days ";
         if(hours) uptimeString += hours + " hours ";
