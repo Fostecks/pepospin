@@ -57,4 +57,11 @@ describe('Trie', function () {
             assert(result.includes('cats'));
         });
     });
+
+    it('supports emoji', function() {
+        let trie = new Trie(['yacht-rock-🛥']);
+        assert.deepStrictEqual(trie.find('yacht'), ['yacht-rock-🛥']);
+        trie.add('🤠-howdy-🤠');
+        assert.deepStrictEqual(trie.find('🤠'), ['🤠-howdy-🤠']);
+    });
 });
