@@ -33,7 +33,8 @@ class Random extends Commando.Command {
         let connection = message.guild.voiceConnection;
         if(radioMap && randomRadio && connection) {
             let linkArray = radioMap[randomRadio];
-            utils.play(linkArray, connection, message.channel);
+            let shuffledLinkArray = utils.shuffleArray(linkArray);
+            utils.play(shuffledLinkArray, connection, message.channel);
         }
     }
 }

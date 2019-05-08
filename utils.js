@@ -22,8 +22,7 @@ module.exports = {
         let player = new Player().getInstance();
         await player.killActiveQueue();
         if(linkArray && connection) {
-            let shuffledLinkArray = this.shuffleArray(linkArray);
-            await player.playArray(shuffledLinkArray, connection, channel).then(() => {
+            await player.playArray(linkArray, connection, channel).then(() => {
                 if(indexExports.bot.killCommand === false) {
                     connection.disconnect();
                 }
