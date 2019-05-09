@@ -38,6 +38,8 @@ class Play extends Commando.Command {
                     linkArray = radioMap[results[0]];
                 } else if (results.length > 1) {
                     throw new Error("Multiple channels found with that prefix: " + results);
+                } else {
+                    message.channel.send("0 results found");
                 }
             }
             let shuffledLinkArray = utils.shuffleArray(linkArray);
