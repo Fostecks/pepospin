@@ -28,9 +28,18 @@ class Play extends Commando.Command {
      */
     async run(message, args) {
         let radioMap = indexExports.getMap();
+        let radioTrie = indexExports.getTrie();
         let connection = message.guild.voiceConnection;
-        if(radioMap && connection && args) {
+        if(radioMap && radioTrie && connection && args) {
             let linkArray = radioMap[args];
+            if (!linkArray) {
+                let results = radioTrie.find(args);
+                if (results.length === 1) {
+                    linkArray = radioMap[results[0]];
+                } else if (results.length > 1) {
+                    throw new Error("Multiple channels found with that prefix: " + results);
+                }
+            }
             let shuffledLinkArray = utils.shuffleArray(linkArray);
             utils.play(shuffledLinkArray, connection, message.channel);
         }
