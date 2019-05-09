@@ -1,5 +1,6 @@
 const Commando = require("discord.js-commando");
 const {token, BOT_CLIENT_ID} = require('./config.json') 
+const Trie = require('./trie');
 
 const bot = new Commando.Client({
     disableEveryone: true,
@@ -11,6 +12,7 @@ const BOT_CHANNEL_NAME = "bot";
 const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
 const LINK_REGEX = /https:\/\/(www\.)?(youtube.com|youtu.be)[a-zA-Z.0-9\/?=&-_]+/g;
 let radioMap = {};
+let radioTrie;
 let latestBotMessage;
 let latestCommandMessage;
 
@@ -27,6 +29,7 @@ bot.login(token);
  ***********/
 bot.on('ready', async () => {
     await constructRadioMap();
+    radioTrie = new Trie(Object.keys(radioMap));
     bot.birthdate = Date.now();
     bot.registry.registerGroup("cmd", "Commands");
     bot.registry.registerGroup("debug", "Debug");
@@ -240,8 +243,13 @@ function getMap() {
     return radioMap;
 }
 
+function getTrie() {
+    return radioTrie;
+}
+
 module.exports = {
     "bot": bot,
     "getMap": getMap,
+    "getTrie": getTrie,
     "constructRadioMap": constructRadioMap
 }
