@@ -31,6 +31,16 @@ describe('Trie', function () {
         });
     });
 
+    describe('remove', function() {
+       
+        it('works', function() {
+            let trie = new Trie(['cat']);
+            assert.deepStrictEqual(trie.find('cat'), ['cat']);
+            trie.remove('cat');
+            assert.deepStrictEqual(trie.find('cat'), []);
+        });
+    });
+
     describe('find', function() {
 
         let trie;
