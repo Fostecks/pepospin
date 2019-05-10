@@ -28,6 +28,10 @@ class Trie {
         }
     }
 
+    remove(channel) {
+        
+    }
+
     find(prefix) {
         let curr = this.root;
 
