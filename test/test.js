@@ -53,6 +53,7 @@ describe('Trie', function () {
 
         it('matches multiple', function() {
             let result = trie.find('cat');
+            assert(result.length === 2);
             assert(result.includes('cat'));
             assert(result.includes('cats'));
         });
