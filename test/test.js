@@ -33,11 +33,44 @@ describe('Trie', function () {
 
     describe('remove', function() {
        
-        it('works', function() {
+        it('works in simple cases', function() {
             let trie = new Trie(['cat']);
             assert.deepStrictEqual(trie.find('cat'), ['cat']);
             trie.remove('cat');
             assert.deepStrictEqual(trie.find('cat'), []);
+        });
+
+        describe('complex cases', function() {
+
+            let trie;
+
+            beforeEach(function() {
+                trie = new Trie(['cat', 'cats', 'catsushi']);
+            });
+
+            it('removes a shortest element', function() {
+                trie.remove('cat');
+                let result = trie.find('c');
+                assert(result.length === 2);
+                assert(result.includes('cats'));
+                assert(result.includes('catsushi'));
+            });
+
+            it('removes a middle element', function() {
+                trie.remove('cats');
+                let result = trie.find('c');
+                assert(result.length === 2);
+                assert(result.includes('cat'));
+                assert(result.includes('catsushi'));
+            });
+
+            it('removes a longest element', function() {
+                trie.remove('catsushi');
+                let result = trie.find('c');
+                assert(result.length === 2);
+                assert(result.includes('cat'));
+                assert(result.includes('cats'));
+            });
         });
     });
 
