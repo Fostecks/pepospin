@@ -32,7 +32,11 @@ class Trie {
         let curr = this.root;
         let chars = channel.split('');
 
-        this._remove(chars, curr);
+        let collapse = this._remove(chars, curr);
+
+        if (collapse) {
+            delete curr[Object.keys(curr)[0]];
+        }
     }
 
     _remove(chars, curr, collapse) {
