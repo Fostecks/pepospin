@@ -29,7 +29,41 @@ class Trie {
     }
 
     remove(channel) {
-        
+        let curr = this.root;
+        let chars = channel.split('');
+
+        this._remove(chars, curr);
+    }
+
+    _remove(chars, curr, collapse) {
+        let c = chars.shift();
+        curr = curr[c];
+
+        if (chars.length > 0) {
+            collapse = this._remove(chars, curr, collapse);
+        }
+
+        if (collapse === true) {
+            if (curr.end) {
+                return false;
+            }
+            delete curr[Object.keys(curr)[0]];
+            return true;
+        }
+
+        if (collapse === false) {
+            return false;
+        }
+
+        if (collapse === undefined) {
+            delete curr.end;
+        }
+
+        if (!collapse && Object.keys(curr).length === 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     find(prefix) {
