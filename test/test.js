@@ -101,6 +101,18 @@ describe('Trie', function () {
         });
     });
 
+    describe('isEmpty', function() {
+
+        it('works', function() {
+            let trie = new Trie();
+            assert(trie.isEmpty());
+            trie.add('cat');
+            assert(!trie.isEmpty());
+            trie.remove('cat');
+            assert(trie.isEmpty());
+        });
+    });
+
     it('supports emoji', function() {
         let trie = new Trie(['yacht-rock-🛥']);
         assert.deepStrictEqual(trie.find('yacht'), ['yacht-rock-🛥']);
