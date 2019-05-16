@@ -31,6 +31,50 @@ describe('Trie', function () {
         });
     });
 
+    describe('remove', function() {
+       
+        it('works in simple cases', function() {
+            let trie = new Trie(['cat']);
+            assert.deepStrictEqual(trie.find('cat'), ['cat']);
+            trie.remove('cat');
+            assert.deepStrictEqual(trie.find('cat'), []);
+            assert(trie.isEmpty());
+        });
+
+        describe('complex cases', function() {
+
+            let trie;
+
+            beforeEach(function() {
+                trie = new Trie(['cat', 'cats', 'catsushi']);
+            });
+
+            it('removes a shortest element', function() {
+                trie.remove('cat');
+                let result = trie.find('c');
+                assert(result.length === 2);
+                assert(result.includes('cats'));
+                assert(result.includes('catsushi'));
+            });
+
+            it('removes a middle element', function() {
+                trie.remove('cats');
+                let result = trie.find('c');
+                assert(result.length === 2);
+                assert(result.includes('cat'));
+                assert(result.includes('catsushi'));
+            });
+
+            it('removes a longest element', function() {
+                trie.remove('catsushi');
+                let result = trie.find('c');
+                assert(result.length === 2);
+                assert(result.includes('cat'));
+                assert(result.includes('cats'));
+            });
+        });
+    });
+
     describe('find', function() {
 
         let trie;
@@ -59,10 +103,24 @@ describe('Trie', function () {
         });
     });
 
+    describe('isEmpty', function() {
+
+        it('works', function() {
+            let trie = new Trie();
+            assert(trie.isEmpty());
+            trie.add('cat');
+            assert(!trie.isEmpty());
+            trie.remove('cat');
+            assert(trie.isEmpty());
+        });
+    });
+
     it('supports emoji', function() {
         let trie = new Trie(['yacht-rock-🛥']);
         assert.deepStrictEqual(trie.find('yacht'), ['yacht-rock-🛥']);
         trie.add('🤠-howdy-🤠');
         assert.deepStrictEqual(trie.find('🤠'), ['🤠-howdy-🤠']);
+        trie.remove('🤠-howdy-🤠');
+        assert.deepStrictEqual(trie.find('🤠'), []);
     });
 });
