@@ -106,5 +106,7 @@ describe('Trie', function () {
         assert.deepStrictEqual(trie.find('yacht'), ['yacht-rock-🛥']);
         trie.add('🤠-howdy-🤠');
         assert.deepStrictEqual(trie.find('🤠'), ['🤠-howdy-🤠']);
+        trie.remove('🤠-howdy-🤠');
+        assert.deepStrictEqual(trie.find('🤠'), []);
     });
 });
