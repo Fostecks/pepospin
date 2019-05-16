@@ -31,21 +31,30 @@ class Play extends Commando.Command {
         let radioTrie = indexExports.getTrie();
         let connection = message.guild.voiceConnection;
         if(radioMap && radioTrie && connection && args) {
-            let linkArray = radioMap[args];
-            if (!linkArray) {
-                let results = radioTrie.find(args);
-                if (results.length === 1) {
-                    linkArray = radioMap[results[0]];
-                } else if (results.length > 1) {
-                    message.channel.send("Multiple channels found with that prefix: " + results);
-                    return;
+            let messages = "";
+            let linkArray = [];
+
+            for (let channel of args.split(' ')) {
+                if (radioMap[channel]) {
+                    linkArray = linkArray.concat(radioMap[channel]);
                 } else {
-                    message.channel.send("No channels found for: " + args);
-                    return;
+                    let trieResults = radioTrie.find(channel);
+                    if (trieResults.length === 1) {
+                        linkArray = linkArray.concat(radioMap[trieResults[0]]);
+                    } else if (trieResults.length > 1) {
+                        messages = messages + "Multiple channels found with that prefix: " + trieResults + "\n";
+                    } else {
+                        messages = messages + "No channels found for: " + channel + "\n";
+                    }
                 }
             }
-            let shuffledLinkArray = utils.shuffleArray(linkArray);
-            utils.play(shuffledLinkArray, connection, message.channel);
+
+            if (messages.length > 0) {
+                message.channel.send(messages);
+            } else {
+                let shuffledLinkArray = utils.shuffleArray(linkArray);
+                utils.play(shuffledLinkArray, connection, message.channel);    
+            }
         }
     }
 }
