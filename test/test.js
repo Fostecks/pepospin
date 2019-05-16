@@ -38,6 +38,7 @@ describe('Trie', function () {
             assert.deepStrictEqual(trie.find('cat'), ['cat']);
             trie.remove('cat');
             assert.deepStrictEqual(trie.find('cat'), []);
+            assert(trie.isEmpty());
         });
 
         describe('complex cases', function() {
