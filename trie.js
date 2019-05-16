@@ -79,6 +79,10 @@ class Trie {
         return this._search(prefix, curr);
     }
 
+    isEmpty() {
+        return Object.keys(this.root).length === 0;
+    }
+
     _search(prefix, curr) {
         let result = [];
         let stack = [];
