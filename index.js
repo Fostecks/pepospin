@@ -88,6 +88,7 @@ bot.on('message', async (message) => {
                 else {
                     console.log("Message added in NEW channel " + message.channel.name + ": Adding link(s): " + links);
                     radioMap[message.channel.name] = links;
+                    radioTrie.add(message.channel.name);
                 }
             }
         }
