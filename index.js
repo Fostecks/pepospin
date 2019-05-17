@@ -1,5 +1,5 @@
 const Commando = require("discord.js-commando");
-const {token, BOT_CLIENT_ID} = require('./config.json') 
+const {TOKEN, BOT_CLIENT_ID, DISCORD_GUILD_NAME, BOT_CHANNEL_NAME, TEXT_CHANNEL_BLACKLIST} = require('./config.json') 
 const Trie = require('./trie');
 
 const bot = new Commando.Client({
@@ -7,9 +7,7 @@ const bot = new Commando.Client({
     unknownCommandResponse: false,
 });
 
-const PRIMARY_DISCORD_GUILD_NAME = "Underground Radio";
-const BOT_CHANNEL_NAME = "bot";
-const textChannelBlacklist = ["rules", "general", "monstercat-album-art"];
+
 const LINK_REGEX = /https:\/\/(www\.)?(youtube.com|youtu.be)[a-zA-Z.0-9\/?=&-_]+/g;
 let radioMap = {};
 let radioTrie;
@@ -17,7 +15,7 @@ let latestBotMessage;
 let latestCommandMessage;
 
 
-bot.login(token);
+bot.login(TOKEN);
 
 /*******************************
  *        EVENT HANDLERS       *
@@ -52,7 +50,7 @@ bot.on('ready', async () => {
  * ON NEW MESSAGE *
  *****************/
 bot.on('message', async (message) => {
-    if(!message.guild || message.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(!message.guild || message.guild.name !== DISCORD_GUILD_NAME) return;
     //is message in bot channel
     if(message.channel.name === BOT_CHANNEL_NAME) {
 
@@ -78,7 +76,7 @@ bot.on('message', async (message) => {
     }
     //else if message is a new song in a radio channel
     else {
-        if(!textChannelBlacklist.includes(message.channel.name)) {
+        if(!TEXT_CHANNEL_BLACKLIST.includes(message.channel.name)) {
             let links = message.content.match(LINK_REGEX);
             if(links) {
                 if(message.channel.name in radioMap) {
@@ -99,7 +97,7 @@ bot.on('message', async (message) => {
  * ON MESSAGE UPDATE *
  ********************/
 bot.on('messageUpdate', (oldMessage, newMessage) => {
-    if(!oldMessage.guild || oldMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(!oldMessage.guild || oldMessage.guild.name !== DISCORD_GUILD_NAME) return;
     if(oldMessage.channel.name === BOT_CHANNEL_NAME) return;
 
     // delete old links
@@ -127,7 +125,7 @@ bot.on('messageUpdate', (oldMessage, newMessage) => {
  * ON CHANNEL UPDATE *
  ********************/
 bot.on('channelUpdate', (oldChannel, newChannel) => {
-    if(oldChannel.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(oldChannel.guild.name !== DISCORD_GUILD_NAME) return;
 
     if(oldChannel.name !== newChannel.name) {
         if(radioMap[newChannel.name] !== undefined) {
@@ -148,7 +146,7 @@ bot.on('channelUpdate', (oldChannel, newChannel) => {
  * ON MESSAGE DELETE *
  ********************/
 bot.on('messageDelete', deletedMessage => {
-    if(!deletedMessage.guild || deletedMessage.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(!deletedMessage.guild || deletedMessage.guild.name !== DISCORD_GUILD_NAME) return;
     if(deletedMessage.channel.name === BOT_CHANNEL_NAME) return;
 
     // delete old links
@@ -168,7 +166,7 @@ bot.on('messageDelete', deletedMessage => {
  * ON CHANNEL DELETE *
  ********************/
 bot.on('channelDelete', deletedChannel => {
-    if(deletedChannel.guild.name !== PRIMARY_DISCORD_GUILD_NAME) return;
+    if(deletedChannel.guild.name !== DISCORD_GUILD_NAME) return;
 
     if(radioMap[deletedChannel.name] === undefined) return;
     
@@ -186,11 +184,11 @@ function constructRadioMap() {
     let time1 = Date.now();
     console.log("Constructing radio map...")
     radioMap = {};
-    bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === PRIMARY_DISCORD_GUILD_NAME);
+    bot.primaryDiscordGuild = bot.guilds.find(guild => guild.name === DISCORD_GUILD_NAME);
     let textChannels = bot.primaryDiscordGuild.channels.filter(channel => channel.type === "text");
 
     const constructRadioMapPromise = Promise.all(textChannels
-        .filter(textChannel => !textChannelBlacklist.includes(textChannel.name))
+        .filter(textChannel => !TEXT_CHANNEL_BLACKLIST.includes(textChannel.name))
         .map(textChannel =>  textChannel.fetchMessages())
     ).then(allMessages => {
         allMessages.forEach(channelMessages => {
