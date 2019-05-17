@@ -88,6 +88,7 @@ bot.on('message', async (message) => {
                 else {
                     console.log("Message added in NEW channel " + message.channel.name + ": Adding link(s): " + links);
                     radioMap[message.channel.name] = links;
+                    radioTrie.add(message.channel.name);
                 }
             }
         }
@@ -136,6 +137,9 @@ bot.on('channelUpdate', (oldChannel, newChannel) => {
         radioMap[newChannel.name] = radioMap[oldChannel.name];
         delete radioMap[oldChannel.name];
 
+        radioTrie.remove(oldChannel.name);
+        radioTrie.add(newChannel.name);
+
         console.log("Updated radioMap channel: " + oldChannel.name + " with new name: " + newChannel.name); 
     }
 });
@@ -169,6 +173,7 @@ bot.on('channelDelete', deletedChannel => {
     if(radioMap[deletedChannel.name] === undefined) return;
     
     delete radioMap[deletedChannel.name];
+    radioTrie.remove(deletedChannel.name);
     console.log("Deleted channel from radioMap: " + deletedChannel.name);
 
 });
