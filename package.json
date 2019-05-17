@@ -1,0 +1,21 @@
+{
+  "name": "pepospin",
+  "version": "1.0.0",
+  "description": "A Node.js Discord bot to support a Sirius-XM-style Discord guild",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --inspect-brk"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "discord.js-commando": "^0.10.0",
+    "ffmpeg": "0.0.4",
+    "opusscript": "0.0.6",
+    "ytdl-core-discord": "^1.0.3"
+  },
+  "devDependencies": {
+    "mocha": "^6.1.4"
+  }
+}
