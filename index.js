@@ -189,7 +189,7 @@ function constructRadioMap() {
 
     const constructRadioMapPromise = Promise.all(textChannels
         .filter(textChannel => !TEXT_CHANNEL_BLACKLIST.includes(textChannel.name))
-        .map(textChannel =>  textChannel.fetchMessages())
+        .map(textChannel =>  textChannel.fetchMessages({limit: 100}))
     ).then(allMessages => {
         allMessages.forEach(channelMessages => {
             let messageArray = channelMessages.array();
