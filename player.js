@@ -19,7 +19,7 @@ class Player {
         await _videoMetadataPromise;
         let richText = new discord.RichEmbed()
             .addField("Now Playing", _videoMetadata.videoInfo.title)
-            .setThumbnail(_videoMetadata.videoInfo.thumbnail_url)
+            .setThumbnail(_videoMetadata.videoInfo.player_response.videoDetails.thumbnail.thumbnails[0].url)
             .setColor(0xFF0000)
             .setFooter(_videoMetadata.videoFormat.audioBitrate + "kbps • " + 
                 _videoMetadata.videoFormat.audio_sample_rate / 1000 + " kHz • codec: " + 
