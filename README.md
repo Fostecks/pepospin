@@ -25,3 +25,6 @@ Useful links:
 - Discord API docs: https://discord.js.org
 - discord.js-commando guide (wrapper for discord.js for writing commands): https://github.com/discordjs/Commando-guide
 - ytdl-core (YouTube streaming library) docs: https://github.com/fent/node-ytdl-core 
+
+## Encrypted files
+Using https://git-secret.io/
