@@ -25,7 +25,7 @@ class Export extends Commando.Command {
      */
     async run(message, args) {
         let radioMap = indexExports.getMap();
-        fs.writeFileSync('radio.json', JSON.stringify(radioMap));
+        fs.writeFileSync('radio.json', JSON.stringify(radioMap, null, 2));
         message.channel.send({ files : ['radio.json']});
     }
 }
