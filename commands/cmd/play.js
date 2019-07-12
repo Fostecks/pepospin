@@ -35,6 +35,7 @@ class Play extends Commando.Command {
             let linkArray = [];
 
             for (let channel of args.split(' ')) {
+                channel = channel.toLowerCase();
                 if (radioMap[channel]) {
                     linkArray = linkArray.concat(radioMap[channel]);
                 } else {
