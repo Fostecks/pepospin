@@ -1,6 +1,7 @@
 const Commando = require("discord.js-commando");
 const {TOKEN, BOT_CLIENT_ID, DISCORD_GUILD_NAME, BOT_CHANNEL_NAME, TEXT_CHANNEL_BLACKLIST} = require('./config.json') 
 const Trie = require('./trie');
+const console = require('./logger');
 
 const bot = new Commando.Client({
     disableEveryone: true,
