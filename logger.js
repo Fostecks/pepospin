@@ -1,4 +1,5 @@
 const moment = require('moment');
+const fs = require('fs');
 
 function log(message) {
     _write('log', message);
@@ -13,8 +14,10 @@ function error(message) {
 }
 
 function _write(func, message) {
-    let out = `[${moment().format()}] [${func.toUpperCase()}] ${message}`;
+    let m = moment();
+    let out = `[${m.format()}] [${func.toUpperCase()}] ${message}`;
     console[func](out);
+    fs.appendFileSync(`./logs/${m.format('YYYY-MM-DD')}.log`, `${out}\n`);
 }
 
 module.exports = {
