@@ -1,6 +1,9 @@
 const moment = require('moment');
 const fs = require('fs');
 
+let logsDir = './logs';
+if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir);
+
 function log(message) {
     _write('log', message);
 }
