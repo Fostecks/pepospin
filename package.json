@@ -1,9 +1,10 @@
 {
   "name": "pepospin",
-  "version": "1.0.0",
+  "version": "0.3.1",
   "description": "A Node.js Discord bot to support a Sirius-XM-style Discord guild",
   "main": "index.js",
   "scripts": {
+    "start": "node .",
     "test": "mocha --inspect-brk"
   },
   "author": "",
