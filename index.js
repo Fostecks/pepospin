@@ -189,10 +189,9 @@ function constructRadioMap() {
 
     const constructRadioMapPromise = Promise.all(textChannels
         .filter(textChannel => !TEXT_CHANNEL_BLACKLIST.includes(textChannel.name))
-        .map(textChannel =>  textChannel.fetchMessages({limit: 100}))
+        .map(textChannel => fetchAllMessages(textChannel))
     ).then(allMessages => {
-        allMessages.forEach(channelMessages => {
-            let messageArray = channelMessages.array();
+        allMessages.forEach(messageArray => {
             if(messageArray.length === 0) return;
             let linkCollection = collectLinks(messageArray);
             let channelName = messageArray[0].channel.name;
@@ -206,6 +205,21 @@ function constructRadioMap() {
     });
 
     return constructRadioMapPromise;
+}
+
+async function fetchAllMessages(textChannel) {
+    let allMessages = [];
+    let options = { limit: 100, before: null };
+    let messagesSize;
+
+    while (!messagesSize || messagesSize === 100) {
+        let messages = await textChannel.fetchMessages(options);
+        allMessages = allMessages.concat(messages.array());
+        options.before = messages.last().id;
+        messagesSize = messages.size;
+    }
+
+    return allMessages;
 }
 
 function pinHelpMessage(channel) {
