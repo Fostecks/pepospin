@@ -1,4 +1,5 @@
 const Commando = require("discord.js-commando");
+const console = require("../../logger");
 
 
 class Version extends Commando.Command {
