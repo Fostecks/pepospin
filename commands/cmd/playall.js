@@ -1,6 +1,7 @@
 const Commando = require("discord.js-commando");
 const indexExports = require("../../index.js");
 const utils = require("../../utils.js");
+const console = require("../../logger");
 
 
 /** 

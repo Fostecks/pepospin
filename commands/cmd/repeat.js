@@ -1,5 +1,6 @@
 const Commando = require("discord.js-commando");
 const Player = require("../../player.js");
+const console = require("../../logger");
 
 
 /** 

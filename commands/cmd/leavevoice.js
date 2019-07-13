@@ -1,5 +1,7 @@
 const Commando = require("discord.js-commando");
 const indexExports = require("../../index.js");
+const console = require("../../logger");
+
 
 /** 
  * Bot command to make discord bot leave its current voice channel.
