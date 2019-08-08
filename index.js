@@ -213,8 +213,6 @@ async function fetchAllMessages(textChannel) {
     let options = { limit: 100, before: null };
     let messagesSize;
 
-    if(textChannel.name == "rocket-league") debugger;
-
     while (!messagesSize || messagesSize === 100) {
         let messages = await textChannel.fetchMessages(options);
         if(messages.array().length === 0) break;
@@ -222,7 +220,7 @@ async function fetchAllMessages(textChannel) {
         options.before = messages.last().id;
         messagesSize = messages.size;
     }
-    
+
     console.log("Got " + allMessages.length + " messages from " + textChannel.name)
     return allMessages;
 }
