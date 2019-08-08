@@ -19,12 +19,12 @@ class Player {
     async _postNowPlaying(channel) {
         await _videoMetadataPromise;
         let richText = new discord.RichEmbed()
-            .addField("Now Playing", _videoMetadata.videoInfo.player_response.videoDetails.title)
-            .setThumbnail(_videoMetadata.videoInfo.player_response.videoDetails.thumbnail.thumbnails[0].url)
+            .addField("Now Playing", _videoMetadata.title)
+            .setThumbnail(_videoMetadata.thumbnailUrl)
             .setColor(0xFF0000)
-            .setFooter(_videoMetadata.videoFormat.audioBitrate + "kbps • " + 
-                _videoMetadata.videoFormat.audio_sample_rate / 1000 + " kHz • codec: " + 
-                _videoMetadata.videoFormat.audioEncoding);
+            .setFooter(_videoMetadata.audioBitrate + "kbps • " + 
+                _videoMetadata.audioSampleRate / 1000 + " kHz • codec: " + 
+                _videoMetadata.audioEncoding);
         channel.send(richText);
     }
 
@@ -48,13 +48,17 @@ class Player {
         let ytdl = YTDL(trackUrl, options);
 
         ytdl.on('info', (videoInfo, videoFormat) => {
-            console.log("Audio encoding: " + videoFormat.audioEncoding);
-            console.log("Audio bitrate: " + videoFormat.audioBitrate);
-            console.log("Audio sample rate: " + videoFormat.audio_sample_rate || 44100);
-            console.log("Attempting to play: " + videoInfo.player_response.videoDetails.title);
+            _videoMetadata.title = videoInfo.player_response.videoDetails.title;
+            _videoMetadata.thumbnailUrl = videoInfo.player_response.videoDetails.thumbnail.thumbnails[0].url;
+            _videoMetadata.audioBitrate = videoFormat.audioBitrate;
+            _videoMetadata.audioSampleRate = videoFormat.audio_sample_rate || 44100;
+            _videoMetadata.audioEncoding = videoFormat.audioEncoding;
 
-            _videoMetadata.videoInfo = videoInfo;
-            _videoMetadata.videoFormat = videoFormat;
+            console.log("Audio encoding: " + _videoMetadata.audioEncoding);
+            console.log("Audio bitrate: " + _videoMetadata.audioBitrate);
+            console.log("Audio sample rate: " + _videoMetadata.audioSampleRate);
+            console.log("Attempting to play: " + _videoMetadata.title);
+
             _promiseMethods.resolve(_videoMetadata);
     
             indexExports.bot.user.setActivity(videoInfo.title, { type: 'PLAYING' });
