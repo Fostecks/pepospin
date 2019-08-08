@@ -215,11 +215,13 @@ async function fetchAllMessages(textChannel) {
 
     while (!messagesSize || messagesSize === 100) {
         let messages = await textChannel.fetchMessages(options);
+        if(messages.array().length === 0) break;
         allMessages = allMessages.concat(messages.array());
         options.before = messages.last().id;
         messagesSize = messages.size;
     }
 
+    console.log("Got " + allMessages.length + " messages from " + textChannel.name)
     return allMessages;
 }
 
