@@ -1,6 +1,7 @@
 const Commando = require("discord.js-commando");
 const {TOKEN, BOT_CLIENT_ID, DISCORD_GUILD_NAME, BOT_CHANNEL_NAME, TEXT_CHANNEL_BLACKLIST} = require('./config.json') 
 const Trie = require('./trie');
+const console = require('./logger');
 
 const bot = new Commando.Client({
     disableEveryone: true,
@@ -189,10 +190,9 @@ function constructRadioMap() {
 
     const constructRadioMapPromise = Promise.all(textChannels
         .filter(textChannel => !TEXT_CHANNEL_BLACKLIST.includes(textChannel.name))
-        .map(textChannel =>  textChannel.fetchMessages({limit: 100}))
+        .map(textChannel => fetchAllMessages(textChannel))
     ).then(allMessages => {
-        allMessages.forEach(channelMessages => {
-            let messageArray = channelMessages.array();
+        allMessages.forEach(messageArray => {
             if(messageArray.length === 0) return;
             let linkCollection = collectLinks(messageArray);
             let channelName = messageArray[0].channel.name;
@@ -206,6 +206,21 @@ function constructRadioMap() {
     });
 
     return constructRadioMapPromise;
+}
+
+async function fetchAllMessages(textChannel) {
+    let allMessages = [];
+    let options = { limit: 100, before: null };
+    let messagesSize;
+
+    while (!messagesSize || messagesSize === 100) {
+        let messages = await textChannel.fetchMessages(options);
+        allMessages = allMessages.concat(messages.array());
+        options.before = messages.last().id;
+        messagesSize = messages.size;
+    }
+
+    return allMessages;
 }
 
 function pinHelpMessage(channel) {

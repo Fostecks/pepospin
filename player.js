@@ -1,6 +1,7 @@
 const discord = require("discord.js");
 const YTDL = require("ytdl-core");
 const indexExports = require("./index.js");
+const console = require("./logger");
 
 const _videoMetadata = {};
 let _videoMetadataPromise;

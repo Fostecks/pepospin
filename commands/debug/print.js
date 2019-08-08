@@ -21,7 +21,7 @@ class Print extends Commando.Command {
      */
     async run(message, args) {
         if(!args) {
-            message.send("Need channel name argument.");
+            message.channel.send("Need channel name argument.");
             return;
         }
         let radioMap = indexExports.getMap();

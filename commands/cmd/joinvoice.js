@@ -1,4 +1,6 @@
 const Commando = require("discord.js-commando");
+const console = require("../../logger");
+
 
 /** 
  * Bot command to make discord bot join the invoker's current voice channel.
