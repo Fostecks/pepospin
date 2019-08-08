@@ -18,7 +18,7 @@ class Player {
     async _postNowPlaying(channel) {
         await _videoMetadataPromise;
         let richText = new discord.RichEmbed()
-            .addField("Now Playing", _videoMetadata.videoInfo.title)
+            .addField("Now Playing", _videoMetadata.videoInfo.player_response.videoDetails.title)
             .setThumbnail(_videoMetadata.videoInfo.player_response.videoDetails.thumbnail.thumbnails[0].url)
             .setColor(0xFF0000)
             .setFooter(_videoMetadata.videoFormat.audioBitrate + "kbps • " + 
@@ -49,8 +49,8 @@ class Player {
         ytdl.on('info', (videoInfo, videoFormat) => {
             console.log("Audio encoding: " + videoFormat.audioEncoding);
             console.log("Audio bitrate: " + videoFormat.audioBitrate);
-            console.log("Audio sample rate: " + videoFormat.audio_sample_rate);
-            console.log("Attempting to play: " + videoInfo.title);
+            console.log("Audio sample rate: " + videoFormat.audio_sample_rate || 44100);
+            console.log("Attempting to play: " + videoInfo.player_response.videoDetails.title);
 
             _videoMetadata.videoInfo = videoInfo;
             _videoMetadata.videoFormat = videoFormat;
